@@ -142,4 +142,4 @@ configuration current.
 - [Arc42](https://arc42.org/)
 - [Astro](https://astro.build/)
 - [Astro Starlight](https://starlight.astro.build/)
-- [dotnet-monorepo](https://github.com/froko/dotnet-monorepo)
+- [nx-monorepo](https://github.com/froko/nx-monorepo)
