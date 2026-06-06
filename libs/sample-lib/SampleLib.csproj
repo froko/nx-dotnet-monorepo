@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    TargetFramework, ImplicitUsings, Nullable and the centralized dist/ output
+    are inherited from the root Directory.Build.props.
+  -->
+
+</Project>
