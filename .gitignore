@@ -4,6 +4,13 @@ node_modules
 # Build outputs
 dist
 
+# .NET build artifacts
+[Aa]rtifacts
+bin/
+obj/
+[Tt]est[Rr]esults/
+*.nupkg
+
 # Editors
 .idea
 .vs

@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "sample-lib",
+  "targets": {
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet format",
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

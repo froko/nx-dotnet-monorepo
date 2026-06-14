@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "sample-lib-tests",
+  "targets": {
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet format",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["build"],
+      "outputs": ["{workspaceRoot}/dist/coverage/{projectName}"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "dotnet test {projectRoot} --no-build --no-restore --settings coverage.runsettings --results-directory dist/coverage/{projectName}"
+      }
+    }
+  }
+}

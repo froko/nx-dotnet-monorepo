@@ -1,11 +1,11 @@
 {
-  "name": "nx-monorepo",
+  "name": "nx-dotnet-monorepo",
   "version": "0.0.1",
-  "description": "Nx Monorepo starter project",
+  "description": ".NET/JS Monorepo starter project with Nx",
   "author": "Patrick Ineichen",
   "repository": {
     "type": "git",
-    "url": "https://github.com/froko/nx-monorepo.git"
+    "url": "https://github.com/froko/nx-dotnet-monorepo.git"
   },
   "license": "MIT",
   "scripts": {
@@ -15,10 +15,12 @@
     "lint": "nx run-many -t lint --parallel",
     "build": "nx run-many -t build --parallel",
     "test": "nx run-many -t test",
+    "restore": "nx run-many -t restore",
     "release": "semantic-release"
   },
   "devDependencies": {
     "@froko/prettier-config": "^3.1.0",
+    "@nx/dotnet": "22.7.5",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "prettier": "^3.8.3",
