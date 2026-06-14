@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
-import simplePlantUML from '@akebifiky/remark-simple-plantuml'
+import remarkPlantuml from './src/plugins/remark-plantuml.mjs'
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,7 +10,7 @@ export default defineConfig({
   // optimization on a clean cache (e.g. in CI).
   outDir: './dist',
   markdown: {
-    remarkPlugins: [simplePlantUML],
+    remarkPlugins: [remarkPlantuml],
   },
   image: {
     service: {
@@ -19,12 +19,12 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'nx-monorepo',
+      title: 'nx-dotnet-monorepo',
       social: [
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/froko/nx-monorepo',
+          href: 'https://github.com/froko/nx-dotnet-monorepo',
         },
       ],
       sidebar: [
