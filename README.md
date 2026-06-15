@@ -115,6 +115,12 @@ plugin automatically detects any `.csproj`, `.fsproj` or `.vbproj` file and adds
 the corresponding Nx targets (`build`, `test`, `restore`, `clean`, `publish`,
 `pack`, `run`, `watch`).
 
+> **Prefer the wrapper script.** Calling `dotnet new` directly produces a
+> `.csproj` that duplicates the repo-wide defaults and pins package versions
+> inline, which breaks Central Package Management. Use
+> [`scripts/new-dotnet-project.sh`](#recommended-scaffold-with-the-wrapper-script)
+> so this is handled for you, or clean the project up by hand afterwards.
+
 For an **application** workspace (`apps/` + `libs/`):
 
 ```bash
@@ -155,10 +161,13 @@ dotnet add examples/my-package-sample/MyPackage.Sample.csproj reference packages
 ### Recommended: scaffold with the wrapper script
 
 Use `scripts/new-dotnet-project.sh` instead of calling `dotnet new` directly. It
-runs the same `dotnet new` command and then drops in a workspace-standard
-`project.json` so the project gets the shared Nx targets automatically (a
-`format` target for every project, plus a coverage-enabled `test` target for
-test projects):
+runs the same `dotnet new` command and then:
+
+1. drops in a workspace-standard `project.json` so the project gets the shared
+   Nx targets automatically (a `format` target for every project, plus a
+   coverage-enabled `test` target for test projects), and
+2. tidies the generated `.csproj` so it follows the repo conventions (see
+   [How the `.csproj` is tidied](#how-the-csproj-is-tidied)).
 
 ```bash
 # Application workspace
@@ -180,6 +189,28 @@ straight through to `dotnet new`.
 Common defaults (`TargetFramework`, `Nullable`, `ImplicitUsings`, central output
 to `dist/`) are configured in the root `Directory.Build.props` and inherited by
 every project.
+
+#### How the `.csproj` is tidied
+
+`dotnet new` emits a `.csproj` that repeats globally-defined properties and pins
+package versions inline — neither of which fits this repo. The wrapper rewrites
+the freshly generated `.csproj` so it:
+
+- **Inherits from `Directory.Build.props`.** Properties that are configured
+  centrally (`TargetFramework`, `ImplicitUsings`, `Nullable`) are removed from
+  the project file so they are inherited instead of duplicated. An empty
+  `<PropertyGroup>` left behind is dropped.
+- **Uses Central Package Management (CPM).** This repo enables CPM in
+  `Directory.Packages.props` (`ManagePackageVersionsCentrally` is `true`). The
+  wrapper strips the inline `Version="…"` from every `<PackageReference>` and
+  records it as a `<PackageVersion>` entry in `Directory.Packages.props`. With
+  CPM enabled, leaving a `Version` on a `<PackageReference>` makes restore fail
+  with `NU1008`.
+
+If you scaffold a project with plain `dotnet new` (or add references by hand),
+apply the same two rules yourself: remove the inherited properties, and move
+each package version from the `<PackageReference>` into a `<PackageVersion>` in
+`Directory.Packages.props`.
 
 Because the plugin builds with `--no-restore`, run `pnpm restore` (or
 `dotnet restore`) once after creating or pulling new .NET projects:

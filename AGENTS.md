@@ -40,10 +40,38 @@ scripts/new-dotnet-project.sh xunit    -o packages/my-package-tests -n MyPackage
 scripts/new-dotnet-project.sh console  -o examples/my-package-sample -n MyPackage.Sample  # sample app
 ```
 
-The script runs the same `dotnet new` command and then adds a workspace-standard
-`project.json` so the project picks up the shared Nx targets automatically.
-Using `dotnet new` on its own skips this and produces a project without the
-expected `format`/`test` targets.
+The script runs the same `dotnet new` command and then:
+
+1. adds a workspace-standard `project.json` so the project picks up the shared
+   Nx targets automatically, and
+2. tidies the generated `.csproj` so it matches the repo conventions (see
+   below).
+
+Using `dotnet new` on its own skips both steps and produces a project without
+the expected `format`/`test` targets and with settings that conflict with the
+repo-wide defaults.
+
+### How the generated `.csproj` is tidied
+
+`dotnet new` emits properties that are already defined globally and pins package
+versions inline, neither of which fits this repo. The script rewrites the
+`.csproj` to:
+
+- **Inherit from `Directory.Build.props`** — properties that are set centrally
+  (`TargetFramework`, `ImplicitUsings`, `Nullable`) are removed from the
+  `.csproj` so they are inherited rather than duplicated. An empty
+  `<PropertyGroup>` left behind is dropped.
+- **Use Central Package Management (CPM)** — the repo enables CPM via
+  `Directory.Packages.props` (`ManagePackageVersionsCentrally` is `true`). The
+  script strips the inline `Version="…"` from every `<PackageReference>` and
+  records it as a `<PackageVersion>` entry in `Directory.Packages.props`. With
+  CPM enabled, a `<PackageReference>` that still carries a `Version` fails to
+  restore (`NU1008`).
+
+When editing or adding .NET projects by hand, follow the same rules: never
+re-declare the globally-inherited properties, and never put a `Version` on a
+`<PackageReference>` — add/update the `<PackageVersion>` in
+`Directory.Packages.props` instead.
 
 - Test projects are detected from the template (`xunit`/`nunit`/`mstest`) or an
   output directory ending in `-tests`. Override with `TEST_PROJECT=1` /
