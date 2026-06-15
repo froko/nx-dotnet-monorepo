@@ -90,6 +90,30 @@ dotnet new xunit -o libs/my-lib-tests -n MyLib.Tests
 dotnet add libs/my-lib-tests/MyLib.Tests.csproj reference libs/my-lib/MyLib.csproj
 ```
 
+### Recommended: scaffold with the wrapper script
+
+Use `scripts/new-dotnet-project.sh` instead of calling `dotnet new` directly.
+It runs the same `dotnet new` command and then drops in a workspace-standard
+`project.json` so the project gets the shared Nx targets automatically (a
+`format` target for every project, plus a coverage-enabled `test` target for
+test projects):
+
+```bash
+# Class library  -> project.json with a `format` target
+scripts/new-dotnet-project.sh classlib -o libs/my-lib -n MyLib
+
+# Web API         -> project.json with a `format` target
+scripts/new-dotnet-project.sh webapi -o apps/my-api -n MyApi
+
+# Test project    -> project.json with `format` + coverage `test` target
+scripts/new-dotnet-project.sh xunit -o libs/my-lib-tests -n MyLib.Tests
+```
+
+Test projects are detected from the template (`xunit`/`nunit`/`mstest`) or an
+output directory ending in `-tests`. Force the choice with the `TEST_PROJECT`
+env var (`TEST_PROJECT=1` / `TEST_PROJECT=0`). Any extra arguments are passed
+straight through to `dotnet new`.
+
 Common defaults (`TargetFramework`, `Nullable`, `ImplicitUsings`, central output
 to `dist/`) are configured in the root `Directory.Build.props` and inherited by
 every project.
@@ -109,11 +133,28 @@ nx test my-lib-tests
 > this sample keeps the workspace valid out of the box. Replace or delete it
 > once you have added your own .NET projects.
 
-## Adding AI assistant support
+## AI assistant support
 
-Nx can configure your repository for AI coding assistants. It sets up the Nx MCP
-server, shared skills and an `AGENTS.md` (or assistant-specific instruction
-file) so the assistant understands the workspace.
+This template ships with a vendor-neutral [`AGENTS.md`](./AGENTS.md) instead of
+settings for any specific tool. It follows the [AGENTS.md](https://agents.md)
+convention and is read automatically by several assistants (OpenCode, Cursor,
+Aider, Gemini CLI, and others), telling them — among other things — to scaffold
+new .NET projects with `scripts/new-dotnet-project.sh` so every project gets the
+shared Nx targets.
+
+Assistants that look for their own instruction file can reuse `AGENTS.md`
+without committing tool-specific config to the repo:
+
+- **Claude Code** reads `CLAUDE.md` — add one containing `@AGENTS.md` (or a
+  symlink) locally if you use it.
+- **GitHub Copilot** reads `.github/copilot-instructions.md` — point it at
+  `AGENTS.md` the same way.
+
+### Generating richer configuration with Nx
+
+Nx can additionally configure your repository for AI coding assistants. It sets
+up the Nx MCP server, shared skills and an `AGENTS.md` (or assistant-specific
+instruction file) so the assistant understands the workspace.
 
 ```bash
 # Interactively pick the assistants to configure
