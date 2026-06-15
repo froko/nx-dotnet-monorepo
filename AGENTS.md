@@ -23,6 +23,59 @@ building, and make sure the chosen folders are registered in
   Register `packages/*` and `examples/*` in `pnpm-workspace.yaml` before adding
   projects there.
 
+## Converting to a publishable NuGet library workspace
+
+When the user asks to convert the workspace from the default application layout
+(`apps/` + `libs/`) to a publishable NuGet library layout (`packages/` +
+`examples/`), perform **all** of the following steps. The folder names appear in
+several places — missing any one of them leaves the workspace in an inconsistent
+state.
+
+1. **`pnpm-workspace.yaml`** — replace the `apps/*` and `libs/*` globs with
+   `packages/*` and `examples/*` (keep `docs`):
+
+   ```yaml
+   packages:
+     - 'packages/*'
+     - 'examples/*'
+     - 'docs'
+   ```
+
+2. **`.prettierignore`** — replace the `apps` and `libs` lines with `packages`
+   and `examples` (keep `docs` and the other entries) so the new folders are
+   ignored exactly as the old ones were:
+
+   ```
+   packages
+   examples
+   docs
+
+   CHANGELOG.md
+   pnpm-lock.yaml
+   ```
+
+3. **Move existing .NET projects.** Relocate any libraries from `libs/` into
+   `packages/` and any applications from `apps/` into `examples/` (the sample
+   ships in `libs/sample-lib` and `libs/sample-lib-tests`). Use `git mv` so
+   history is preserved, then fix the relative `$schema` path and any
+   `ProjectReference`/`reference` paths in the moved `project.json` and `.csproj`
+   files. If the user prefers a clean slate, delete the samples and scaffold
+   fresh projects with the wrapper script instead.
+
+4. **Make libraries packable.** For each project under `packages/`, set the NuGet
+   metadata (`PackageId`, `Authors`, `Description`, …) and ensure
+   `<IsPackable>true</IsPackable>` (the default for class libraries; keep test
+   projects `IsPackable=false`). Shared metadata can go centrally in
+   `Directory.Build.props`. See [Publishing NuGet packages](#publishing-nuget-packages).
+
+5. **Remove now-empty `apps/`/`libs/` folders** once their projects have moved.
+
+6. **Restore and verify.** Run `pnpm restore`, then `pnpm build`, `pnpm test`,
+   and `pnpm format` to confirm the workspace is consistent after the move.
+
+After the conversion, create new projects in `packages/` (libraries/tests) and
+`examples/` (sample apps), not `apps/`/`libs/`.
+
 ## Creating new .NET projects
 
 **Always create new .NET projects with the wrapper script, not `dotnet new`

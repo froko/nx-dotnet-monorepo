@@ -86,21 +86,57 @@ runnable samples that demonstrate them:
 - `packages/` — libraries that are packed and published as NuGet packages
 - `examples/` — sample apps that consume the packages locally
 
-To enable this layout, register the folders in `pnpm-workspace.yaml`:
-
-```yaml
-packages:
-  - 'apps/*'
-  - 'libs/*'
-  - 'packages/*'
-  - 'examples/*'
-  - 'docs'
-```
-
 Projects under `packages/` are typically packable — set
 `<IsPackable>true</IsPackable>` (the default for class libraries) and run
 `nx pack <project>` to produce a `.nupkg`. The `@nx/dotnet` plugin exposes a
 `pack` target for every library.
+
+#### Converting from the application layout
+
+If you started with the default `apps/` + `libs/` layout and want to switch to
+publishable packages, update every place that names the folders — otherwise the
+workspace ends up inconsistent:
+
+1. **`pnpm-workspace.yaml`** — replace the `apps/*` and `libs/*` globs with
+   `packages/*` and `examples/*` (keep `docs`):
+
+   ```yaml
+   packages:
+     - 'packages/*'
+     - 'examples/*'
+     - 'docs'
+   ```
+
+2. **`.prettierignore`** — replace the `apps` and `libs` lines with `packages`
+   and `examples` (keep `docs` and the rest):
+
+   ```
+   packages
+   examples
+   docs
+
+   CHANGELOG.md
+   pnpm-lock.yaml
+   ```
+
+3. **Move existing projects** — relocate libraries from `libs/` into `packages/`
+   and apps from `apps/` into `examples/` (use `git mv` to preserve history),
+   then fix the relative `$schema` path and any `ProjectReference`/`reference`
+   paths in the moved `project.json`/`.csproj` files. The template ships a sample
+   in `libs/sample-lib` and `libs/sample-lib-tests`; move or replace it. If you'd
+   rather start clean, delete the samples and scaffold fresh projects with the
+   [wrapper script](#recommended-scaffold-with-the-wrapper-script).
+
+4. **Make the libraries packable** — set the NuGet metadata (`PackageId`,
+   `Authors`, `Description`, …) and `<IsPackable>true</IsPackable>` for each
+   library (keep test projects `IsPackable=false`).
+
+5. **Remove the now-empty `apps/`/`libs/` folders**, then run `pnpm restore`
+   followed by `pnpm build`, `pnpm test` and `pnpm format` to verify.
+
+> Working with an AI assistant? `AGENTS.md` documents this same conversion
+> checklist, so you can simply ask it to "convert the workspace to publishable
+> NuGet libraries".
 
 ### Customizing the layout
 
