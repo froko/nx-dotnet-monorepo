@@ -122,10 +122,10 @@ workspace ends up inconsistent:
 3. **Move existing projects** — relocate libraries from `libs/` into `packages/`
    and apps from `apps/` into `examples/` (use `git mv` to preserve history),
    then fix the relative `$schema` path and any `ProjectReference`/`reference`
-   paths in the moved `project.json`/`.csproj` files. The template ships a sample
-   in `libs/sample-lib` and `libs/sample-lib-tests`; move or replace it. If you'd
-   rather start clean, delete the samples and scaffold fresh projects with the
-   [wrapper script](#recommended-scaffold-with-the-wrapper-script).
+   paths in the moved `project.json`/`.csproj` files. The template ships a
+   sample in `libs/sample-lib` and `libs/sample-lib-tests`; move or replace it.
+   If you'd rather start clean, delete the samples and scaffold fresh projects
+   with the [wrapper script](#recommended-scaffold-with-the-wrapper-script).
 
 4. **Make the libraries packable** — set the NuGet metadata (`PackageId`,
    `Authors`, `Description`, …) and `<IsPackable>true</IsPackable>` for each
@@ -148,8 +148,12 @@ You can add more directories or rename the default ones by editing
 
 .NET projects are created with the standard `dotnet new` CLI. The `@nx/dotnet`
 plugin automatically detects any `.csproj`, `.fsproj` or `.vbproj` file and adds
-the corresponding Nx targets (`build`, `test`, `restore`, `clean`, `publish`,
-`pack`, `run`, `watch`).
+the corresponding Nx targets (`build`, `restore`, `clean`, `publish`, `pack`,
+`run`, `watch`). The `format`, `lint` and `test` targets are not inferred by the
+plugin — they come from the workspace-standard `project.json` added by the
+[wrapper script](#recommended-scaffold-with-the-wrapper-script) (`format` runs
+`dotnet format`, `lint` runs `dotnet format --verify-no-changes`, and `test`
+runs `dotnet test` with coverage).
 
 > **Prefer the wrapper script.** Calling `dotnet new` directly produces a
 > `.csproj` that duplicates the repo-wide defaults and pins package versions
@@ -200,8 +204,8 @@ Use `scripts/new-dotnet-project.sh` instead of calling `dotnet new` directly. It
 runs the same `dotnet new` command and then:
 
 1. drops in a workspace-standard `project.json` so the project gets the shared
-   Nx targets automatically (a `format` target for every project, plus a
-   coverage-enabled `test` target for test projects), and
+   Nx targets automatically (a `format` and a `lint` target for every project,
+   plus a coverage-enabled `test` target for test projects), and
 2. tidies the generated `.csproj` so it follows the repo conventions (see
    [How the `.csproj` is tidied](#how-the-csproj-is-tidied)).
 

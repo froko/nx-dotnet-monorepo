@@ -58,15 +58,16 @@ state.
    `packages/` and any applications from `apps/` into `examples/` (the sample
    ships in `libs/sample-lib` and `libs/sample-lib-tests`). Use `git mv` so
    history is preserved, then fix the relative `$schema` path and any
-   `ProjectReference`/`reference` paths in the moved `project.json` and `.csproj`
-   files. If the user prefers a clean slate, delete the samples and scaffold
-   fresh projects with the wrapper script instead.
+   `ProjectReference`/`reference` paths in the moved `project.json` and
+   `.csproj` files. If the user prefers a clean slate, delete the samples and
+   scaffold fresh projects with the wrapper script instead.
 
-4. **Make libraries packable.** For each project under `packages/`, set the NuGet
-   metadata (`PackageId`, `Authors`, `Description`, …) and ensure
+4. **Make libraries packable.** For each project under `packages/`, set the
+   NuGet metadata (`PackageId`, `Authors`, `Description`, …) and ensure
    `<IsPackable>true</IsPackable>` (the default for class libraries; keep test
    projects `IsPackable=false`). Shared metadata can go centrally in
-   `Directory.Build.props`. See [Publishing NuGet packages](#publishing-nuget-packages).
+   `Directory.Build.props`. See
+   [Publishing NuGet packages](#publishing-nuget-packages).
 
 5. **Remove now-empty `apps/`/`libs/` folders** once their projects have moved.
 
@@ -96,13 +97,14 @@ scripts/new-dotnet-project.sh console  -o examples/my-package-sample -n MyPackag
 The script runs the same `dotnet new` command and then:
 
 1. adds a workspace-standard `project.json` so the project picks up the shared
-   Nx targets automatically, and
+   Nx targets automatically (a `format` and a `lint` target for every project,
+   plus a coverage-enabled `test` target for test projects), and
 2. tidies the generated `.csproj` so it matches the repo conventions (see
    below).
 
 Using `dotnet new` on its own skips both steps and produces a project without
-the expected `format`/`test` targets and with settings that conflict with the
-repo-wide defaults.
+the expected `format`/`lint`/`test` targets and with settings that conflict with
+the repo-wide defaults.
 
 ### How the generated `.csproj` is tidied
 
@@ -148,6 +150,9 @@ For the publishable-library use case, every library has a `pack` target from the
   them per project.
 - Test coverage settings are centralized in `coverage.runsettings`; the `test`
   target writes a Cobertura report to `dist/coverage/<project-name>`.
+- For .NET projects the `format` target runs `dotnet format` (writes fixes) and
+  the `lint` target runs `dotnet format --verify-no-changes --no-restore` (fails
+  if the code is not formatted). Both live in each project's `project.json`.
 - Commit messages follow
   [Conventional Commits](https://www.conventionalcommits.org/).
 - Common tasks: `pnpm build`, `pnpm test`, `pnpm lint`, `pnpm format`,

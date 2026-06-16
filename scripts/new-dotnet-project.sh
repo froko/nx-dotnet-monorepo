@@ -245,6 +245,15 @@ if is_test_project; then
         "cwd": "{projectRoot}"
       }
     },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["restore"],
+      "options": {
+        "command": "dotnet format --verify-no-changes --no-restore",
+        "cwd": "{projectRoot}"
+      }
+    },
     "test": {
       "executor": "nx:run-commands",
       "cache": true,
@@ -269,6 +278,15 @@ else
       "executor": "nx:run-commands",
       "options": {
         "command": "dotnet format",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["restore"],
+      "options": {
+        "command": "dotnet format --verify-no-changes --no-restore",
         "cwd": "{projectRoot}"
       }
     }
