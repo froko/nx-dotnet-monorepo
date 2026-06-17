@@ -38,9 +38,9 @@ A solid starting point for your new Nx based mixed .NET/JavaScript MonoRepo.
    ```
 
 4. Make it yours by changing some information in the following files
-   - `README.json`
+   - `README.md` (project name, description, usage instructions)
    - `package.json` (name, description, author, repository url)
-   - `docs/astro.config.json` (title, social url)
+   - `docs/astro.config.mjs` (title, social url)
    - `docs/src/content/docs/index.mdx` (title)
 
 5. Commit your changes
