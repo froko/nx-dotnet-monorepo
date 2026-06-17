@@ -26,6 +26,7 @@ obj/
 
 # Tooling
 .nx/cache
+.nx/migrate-runs
 .nx/workspace-data
 .claude/worktrees
 .claude/settings.local.json
