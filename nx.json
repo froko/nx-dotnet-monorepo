@@ -2,6 +2,10 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "analytics": false,
   "targetDefaults": {
+    "restore": {
+      "cache": true,
+      "outputs": ["{workspaceRoot}/dist/intermediates/{projectRoot}/obj"]
+    },
     "format": {
       "cache": true
     },
